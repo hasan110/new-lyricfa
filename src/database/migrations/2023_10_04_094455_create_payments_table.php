@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reports', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->bigIncrements('id');
 
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->bigInteger('amount')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->text('id_zarin')->nullable();
-            $table->bigInteger('val_money')->nullable();
-            $table->integer('type')->default(0);
-            $table->text('ref_id')->nullable();
+            $table->integer('status')->default(0);
+            $table->text('transaction_id')->nullable();
+            $table->text('tracking_code')->nullable();
             $table->timestamps();
         });
     }

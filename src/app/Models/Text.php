@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Text
@@ -36,5 +37,14 @@ class Text extends Model
     public function music(): belongsTo
     {
         return $this->belongsTo(Music::class, 'music_id');
+    }
+
+    /**
+     * every text has a lot of suggestions
+     * @return HasMany
+     */
+    public function suggestions(): HasMany
+    {
+        return $this->hasMany(UserSuggestion::class, 'text_id');
     }
 }

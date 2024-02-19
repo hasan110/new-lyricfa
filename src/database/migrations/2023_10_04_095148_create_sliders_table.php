@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('type')->default(0);
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->text('banner')->nullable();
             $table->boolean('show_it')->default(0);
             $table->timestamps();
         });

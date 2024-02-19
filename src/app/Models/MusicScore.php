@@ -26,6 +26,15 @@ class MusicScore extends Model
     protected $guarded = ['id'];
 
     /**
+     * every music score is related to a user
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * every music score is related to a music
      * @return BelongsTo
      */

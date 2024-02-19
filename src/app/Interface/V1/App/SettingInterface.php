@@ -5,7 +5,7 @@ namespace App\Interface\V1\App;
 interface SettingInterface
 {
     /**
-     * returns app settings .
+     * returns app settings.
      */
     public function getSettings();
 }

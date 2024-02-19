@@ -12,15 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('playlist_music', function (Blueprint $table) {
-            $table->bigIncrements('id');
-
             $table->bigInteger('music_id')->unsigned();
             $table->foreign('music_id')->references('id')->on('musics')->onDelete('cascade');
-
             $table->bigInteger('playlist_id')->unsigned();
             $table->foreign('playlist_id')->references('id')->on('playlists')->onDelete('cascade');
-
-            $table->timestamps();
         });
     }
 

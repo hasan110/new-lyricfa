@@ -13,12 +13,9 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('username')->unique();
             $table->string('full_name')->nullable();
-            $table->text('profile_picture')->nullable();
-            $table->integer('access_level')->default(0);
+            $table->string('username')->unique();
             $table->text('password');
-            $table->text('api_token')->nullable();
             $table->timestamps();
         });
     }

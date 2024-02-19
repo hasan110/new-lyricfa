@@ -62,8 +62,8 @@ return [
     ],
     'gte' => [
         'array' => 'The :attribute field must have :value items or more.',
-        'file' => 'The :attribute field must be greater than or equal to :value kilobytes.',
         'numeric' => 'The :attribute field must be greater than or equal to :value.',
+        'file' => 'The :attribute field must be greater than or equal to :value kilobytes.',
         'string' => 'The :attribute field must be greater than or equal to :value characters.',
     ],
     'image' => 'The :attribute field must be an image.',

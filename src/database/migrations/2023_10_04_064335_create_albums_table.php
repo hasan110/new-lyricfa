@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('albums', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('album_name_english')->nullable();
-            $table->string('album_name_persian')->nullable();
-            $table->string('singers')->nullable();
-            $table->text('image_url')->nullable();
-            $table->date('create_time')->default("1900-01-01");
+            $table->string('english_name')->nullable();
+            $table->string('persian_name')->nullable();
             $table->timestamps();
         });
     }

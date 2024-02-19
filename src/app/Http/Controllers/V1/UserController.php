@@ -4,13 +4,14 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\Throwable\ValidationException;
 use App\Http\Controllers\Controller;
-use App\Interface\V1\User\UserInterface;
-use App\Repository\V1\User\UserRepository;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use App\Interface\V1\User\UserInterface;
+use App\Repository\V1\User\UserRepository;
 
 
 class UserController extends Controller
@@ -30,15 +31,13 @@ class UserController extends Controller
     public function getUser(Request $request): JsonResponse
     {
         try {
-            DB::beginTransaction();
-            $user = $this->userRepository->getUserData($request);
-            DB::commit();
-        }catch (Exception $e){
-            DB::rollBack();
-            return $this->error($e->getMessage() , []);
+            return $this->success(
+                $this->userRepository->getUserData($request),
+                __('messages.success_result')
+            );
+        } catch (Exception $e) {
+            return $this->error($e->getMessage(), []);
         }
-
-        return $this->success($user , __('messages.success_result'));
     }
 
     /**
@@ -50,14 +49,14 @@ class UserController extends Controller
     {
         try {
             DB::beginTransaction();
-            $user = $this->userRepository->addSubscription($request->user() , 30 , 'minute');
+            $user = $this->userRepository->addSubscription($request->user(), 30, 'minute');
             DB::commit();
-        }catch (Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
-            return $this->error($e->getMessage() , []);
+            return $this->error($e->getMessage(), []);
         }
 
-        return $this->success(Carbon::parse($user->expired_at)->format('Y-m-d H:i') , __('messages.success_operation'));
+        return $this->success(Carbon::parse($user->expired_at)->format('Y-m-d H:i'), __('messages.success_operation'));
     }
 
     /**
@@ -69,20 +68,20 @@ class UserController extends Controller
      */
     public function saveFcmToken(Request $request): JsonResponse
     {
-        validateData($request , [
+        validateData($request, [
             'fcm_token' => 'required'
         ]);
 
         try {
             DB::beginTransaction();
-            $this->userRepository->saveFcmToken($request->user() , $request->input('fcm_token'));
+            $this->userRepository->saveFcmToken($request->user(), $request->input('fcm_token'));
             $user = $this->userRepository->getUserData($request);
             DB::commit();
-        }catch (Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
-            return $this->error($e->getMessage() , []);
+            return $this->error($e->getMessage(), []);
         }
 
-        return $this->success($user , __('messages.success_operation'));
+        return $this->success($user, __('messages.success_operation'));
     }
 }

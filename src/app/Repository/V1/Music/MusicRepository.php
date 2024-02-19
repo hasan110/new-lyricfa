@@ -4,7 +4,7 @@ namespace App\Repository\V1\Music;
 
 use App\Interface\V1\Music\MusicInterface;
 use App\Models\Music;
-use Exception;
+use App\Exceptions\Throwable\BaseException;
 use App\Http\Resources\Music\MusicListResource;
 
 class MusicRepository implements MusicInterface
@@ -19,11 +19,11 @@ class MusicRepository implements MusicInterface
      * get music list with passed filters
      * @param array $filters
      * @return array
-     * @throws Exception
+     * @throws BaseException
      */
     public function getList(array $filters): array
     {
-        $query = $this->filterApply($filters);
+        $query = $this->filter($filters);
         $paginate = null;
 
         if (isset($filters['limit']) && $filters['limit']) {
@@ -49,10 +49,11 @@ class MusicRepository implements MusicInterface
      * get all music information
      * @param mixed $music_id
      * @return MusicListResource|null
+     * @throws BaseException
      */
     public function getInfo(mixed $music_id): MusicListResource|null
     {
-        $music = $this->filterApply([
+        $music = $this->filter([
             'music_id' => $music_id
         ])->first();
 
@@ -65,16 +66,16 @@ class MusicRepository implements MusicInterface
      * add one view to music views
      * @param mixed $music_id
      * @return void
-     * @throws Exception
+     * @throws BaseException
      */
     public function addView(mixed $music_id): void
     {
-        $music = $this->filterApply([
+        $music = $this->filter([
             'music_id' => $music_id
         ])->first();
 
         if (!$music) {
-            throw new Exception(__('messages.data_not_found'));
+            throw new BaseException(__('errors.data_not_found'));
         }
 
         $music->increment('views');
@@ -85,7 +86,7 @@ class MusicRepository implements MusicInterface
      * @param array $filters
      * @return mixed
      */
-    private function filterApply(array $filters): mixed
+    public function filter(array $filters): mixed
     {
         $query = Music::query()->select('*');
 
@@ -138,5 +139,15 @@ class MusicRepository implements MusicInterface
         }]);
 
         return $query->with('singers')->withCount(['likes', 'comments'])->withAvg('scores', 'score');
+    }
+
+    /**
+     * get music data using id
+     * @param mixed $music_id
+     * @return Music|null
+     */
+    public function getMusicById(mixed $music_id): Music|null
+    {
+        return Music::find($music_id);
     }
 }

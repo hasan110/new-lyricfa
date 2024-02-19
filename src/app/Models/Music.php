@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int $degree
  * @property int $music_video
  * @property int $sync_video
- * @property string $type_video
+ * @property string $video_type
  * @property int $views
  * @property int $start_demo
  * @property int $end_demo
@@ -57,7 +58,7 @@ class Music extends Model
      */
     public function likes(): MorphMany
     {
-        return $this->morphMany(Like::class, 'likeable' , 'likeable_type', 'likeable_id');
+        return $this->morphMany(Like::class, 'likeable', 'likeable_type', 'likeable_id');
     }
 
     /**
@@ -66,7 +67,7 @@ class Music extends Model
      */
     public function comments(): MorphMany
     {
-        return $this->morphMany(Comment::class, 'commentable' , 'commentable_type', 'commentable_id');
+        return $this->morphMany(Comment::class, 'commentable', 'commentable_type', 'commentable_id');
     }
 
     /**
@@ -84,6 +85,33 @@ class Music extends Model
      */
     public function singers(): BelongsToMany
     {
-        return $this->belongsToMany(Singer::class, 'music_singer' , 'music_id' , 'singer_id');
+        return $this->belongsToMany(Singer::class, 'music_singer', 'music_id', 'singer_id');
+    }
+
+    /**
+     * every music has one or more playlists
+     * @return BelongsToMany
+     */
+    public function playlists(): BelongsToMany
+    {
+        return $this->belongsToMany(Playlist::class, 'playlist_music', 'music_id', 'playlist_id');
+    }
+
+    /**
+     * every music is related to an album
+     * @return BelongsTo
+     */
+    public function album(): BelongsTo
+    {
+        return $this->belongsTo(Album::class, 'album_id');
+    }
+
+    /**
+     * every music has a lot of files like poster, source file or ...
+     * @return MorphMany
+     */
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable', 'fileable_type', 'fileable_id');
     }
 }

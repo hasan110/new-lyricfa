@@ -16,7 +16,6 @@ return new class extends Migration
             $table->text('english_word');
             $table->string('word_types')->nullable();
             $table->string('pronunciation')->nullable();
-            $table->text('def')->nullable();
             $table->integer('uk_pron')->default(0);
             $table->integer('us_pron')->default(0);
             $table->timestamps();

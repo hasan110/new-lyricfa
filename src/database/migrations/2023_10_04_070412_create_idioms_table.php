@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->text('phrase');
             $table->string('base');
-            $table->text('definition')->nullable();
+            $table->integer('type')->default(0);
             $table->timestamps();
         });
     }

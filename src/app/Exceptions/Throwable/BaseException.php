@@ -10,7 +10,7 @@ class BaseException extends Exception
     /**
      * @var bool
      */
-    public bool $reportException = true;
+    public bool $reportException = false;
 
     /**
      * BaseException constructor.
@@ -20,7 +20,7 @@ class BaseException extends Exception
      * @param Throwable|null $previous
      * @param bool $reportException
      */
-    public function __construct(string $message = '', int $code = 0, Throwable $previous = null, bool $reportException = true)
+    public function __construct(string $message = '', int $code = 0, bool $reportException = false, Throwable $previous = null)
     {
         $this->reportException = $reportException;
         parent::__construct($message, $code, $previous);

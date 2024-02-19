@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('maps', function (Blueprint $table) {
-            $table->longText('word');
+            $table->longText('word')->primary();
             $table->text('ci_base')->nullable();
             $table->timestamps();
         });

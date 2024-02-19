@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Exceptions\Throwable\ValidationException;
+use App\Exceptions\Throwable\BaseException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\Auth\AuthenticateRequest;
+use App\Http\Requests\V1\Auth\OtpRequest;
 use App\Interface\V1\Auth\AuthInterface;
 use App\Repository\V1\Auth\AuthRepository;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
 
 class AuthController extends Controller
 {
@@ -23,18 +22,11 @@ class AuthController extends Controller
 
     /**
      * according to auth type user can register or login and send otp code to user phone number
-     * @param Request $request
+     * @param AuthenticateRequest $request
      * @return JsonResponse
-     * @throws ValidationException
-     * @throws \Illuminate\Validation\ValidationException
      */
-    public function sendOtpCode(Request $request): JsonResponse
+    public function authenticate(AuthenticateRequest $request): JsonResponse
     {
-        validateData($request , [
-            'phone_number' => 'required|numeric',
-            'prefix_code' => 'required',
-        ]);
-
         list($prefix_code, $phone_number) = validateMobile($request->input('prefix_code'), $request->input('phone_number'));
 
         try {
@@ -44,29 +36,21 @@ class AuthController extends Controller
             $this->authRepository->sendOTP($prefix_code, $phone_number, $activate_code);
             $this->authRepository->saveActivationCode($prefix_code, $phone_number, $auth_type, $activate_code);
             DB::commit();
-        }catch (Exception $e){
+        }catch (BaseException $e){
             DB::rollBack();
-            return $this->error($e->getMessage() , []);
+            return $this->error($e->getMessage(), []);
         }
 
-        return $this->success(null , __('messages.otp_code_successfully_sent'));
+        return $this->success(null, __('messages.otp_code_successfully_sent'));
     }
 
     /**
      * check and validate otp code and return user data (by registering user or retrieve user data)
-     * @param Request $request
+     * @param OtpRequest $request
      * @return JsonResponse
-     * @throws ValidationException
-     * @throws \Illuminate\Validation\ValidationException
      */
-    public function checkOtpCode(Request $request): JsonResponse
+    public function otp(OtpRequest $request): JsonResponse
     {
-        validateData($request , [
-            'phone_number' => 'required|numeric',
-            'prefix_code' => 'required',
-            'code' => 'required|digits:4|numeric',
-        ]);
-
         list($prefix_code, $phone_number) = validateMobile($request->input('prefix_code'), $request->input('phone_number'));
 
         try {
@@ -74,11 +58,11 @@ class AuthController extends Controller
             $this->authRepository->checkActivationCode($prefix_code, $phone_number, $request->input('code'));
             $token = $this->authRepository->prepareUser($prefix_code, $phone_number, $request->input('referral_code'));
             DB::commit();
-        }catch (Exception $e){
+        }catch (BaseException $e){
             DB::rollBack();
-            return $this->error($e->getMessage() , []);
+            return $this->error($e->getMessage(), []);
         }
 
-        return $this->success($token , __('messages.successfully_logged_in'));
+        return $this->success($token, __('messages.successfully_logged_in'));
     }
 }

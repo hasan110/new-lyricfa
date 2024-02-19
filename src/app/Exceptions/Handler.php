@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-use App\Exceptions\Throwable\ValidationException;
+use App\Exceptions\Throwable\BaseException;
+use App\Exceptions\Throwable\ValidationException as CustumValidationException;
+use Illuminate\Validation\ValidationException;
 use App\Traits\StandardJsonResponse;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
@@ -42,13 +44,15 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * @param Throwable $e
+     * @param BaseException|Throwable $e
      *
      * @throws Throwable
      */
-    public function report(Throwable $e)
+    public function report(BaseException|Throwable $e)
     {
-        parent::report($e);
+        if (isset($e->reportException) and $e->reportException === true) {
+            parent::report($e);
+        }
     }
 
     /**
@@ -74,13 +78,15 @@ class Handler extends ExceptionHandler
     {
         switch ($e) {
             case $e instanceof AuthenticationException:
-                return $this->error(__('messages.http_unauthorized') , null , ResponseCode::HTTP_UNAUTHORIZED);
+                return $this->error(__('errors.http_unauthorized') , null , ResponseCode::HTTP_UNAUTHORIZED);
+            case $e instanceof CustumValidationException:
+                return $this->error(__('errors.validation_error') , $e->errors , ResponseCode::HTTP_UNPROCESSABLE_ENTITY);
             case $e instanceof ValidationException:
-                return $this->error(__('messages.validation_error') , $e->errors , ResponseCode::HTTP_UNPROCESSABLE_ENTITY);
+                return $this->error(__('errors.validation_error') , $e->errors() , ResponseCode::HTTP_UNPROCESSABLE_ENTITY);
             case $e instanceof NotFoundHttpException:
-                return $this->error(__('messages.http_not_found') , null , ResponseCode::HTTP_NOT_FOUND);
+                return $this->error(__('errors.http_page_not_found') , null , ResponseCode::HTTP_NOT_FOUND);
             case $e instanceof MethodNotAllowedHttpException:
-                return $this->error(__('messages.http_method_not_allowed') , null , ResponseCode::HTTP_METHOD_NOT_ALLOWED);
+                return $this->error(__('errors.http_method_not_allowed') , null , ResponseCode::HTTP_METHOD_NOT_ALLOWED);
             case $e instanceof Exception:
                 return $this->error($e->getMessage() ,
                     config('app.debug') ? [
@@ -100,29 +106,10 @@ class Handler extends ExceptionHandler
      */
     public function webPageResponse(Throwable $e): Response
     {
-        switch ($e) {
-            case $e instanceof NotFoundHttpException:
-                return response()->view('errors.custom' , [
-                    'message' => $e->getMessage(),
-                    'code' => ResponseCode::HTTP_NOT_FOUND
-                ]);
-            case $e instanceof MethodNotAllowedHttpException:
-                return response()->view('errors.custom' , [
-                    'message' => $e->getMessage(),
-                    'code' => ResponseCode::HTTP_METHOD_NOT_ALLOWED
-                ]);
-            case $e instanceof Exception:
-                return response()->view('errors.custom' , [
-                    'message' => $e->getMessage(),
-                    'code' => ResponseCode::HTTP_INTERNAL_SERVER_ERROR
-                ]);
-            default:
-                return response()->view('errors.custom' , [
-                    'message' => $e->getMessage() ?? __('messages.an_error_occurred'),
-                    'code' => ResponseCode::HTTP_INTERNAL_SERVER_ERROR
-                ]);
-        }
-
+        return response()->view('errors.custom' , [
+            'message' => $e->getMessage() ?? __('errors.an_error_occurred'),
+            'code' => $this->getValidCode($e->getCode())
+        ] , $this->getValidCode($e->getCode()));
     }
 
     /**
@@ -130,7 +117,7 @@ class Handler extends ExceptionHandler
      * @param int $code
      * @return int
      */
-    public function getValidCode(int $code): int
+    private function getValidCode(int $code): int
     {
         $statusCodesText = HttpFoundationResponse::$statusTexts;
         $statusCodes = array_keys($statusCodesText) ?? [];

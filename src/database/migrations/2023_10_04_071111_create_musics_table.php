@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('degree')->default(0);
             $table->integer('music_video')->default(0);
             $table->integer('sync_video')->default(0);
-            $table->string('type_video')->default('mp4');
+            $table->string('video_type')->default('mp4');
             $table->bigInteger('views')->default(0);
             $table->integer('start_demo')->default(0);
             $table->integer('end_demo')->default(0);

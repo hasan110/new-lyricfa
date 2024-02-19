@@ -27,4 +27,11 @@ interface MusicInterface
      * @throws Exception
      */
     public function addView(mixed $music_id): void;
+
+    /**
+     * generate query with passed filters
+     * @param array $filters
+     * @return mixed
+     */
+    public function filter(array $filters): mixed;
 }

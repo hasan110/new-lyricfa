@@ -2,18 +2,18 @@
 
 namespace App\Repository\V1\User;
 
+use App\Exceptions\Throwable\BaseException;
 use App\Interface\V1\User\UserInterface;
+use App\Jobs\SendNotification;
 use App\Models\User;
-use App\Services\Notification\GoogleNotification;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class UserRepository implements UserInterface
 {
     private array $valid_columns = [
-        'phone_number',
+        'id',
         'code_introduce'
     ];
 
@@ -22,12 +22,12 @@ class UserRepository implements UserInterface
      * @param string $column
      * @param mixed $value
      * @return User|null
-     * @throws Exception
+     * @throws BaseException
      */
     public function getUserBy(string $column , mixed $value): User|null
     {
         if (!in_array($column , $this->valid_columns)){
-            throw new Exception('invalid column name passed to function');
+            throw new BaseException('invalid column name passed to function');
         }
 
         return User::where($column , $value)->first();
@@ -45,7 +45,7 @@ class UserRepository implements UserInterface
     }
 
     /**
-     * add subscription to user with passed days .
+     * add subscription to user with passed days.
      * @param User $user
      * @param int $addition
      * @param string $addType
@@ -55,14 +55,13 @@ class UserRepository implements UserInterface
     {
         if (!isset($user->id)) return $user;
 
-        if($user->expired_at > Carbon::now())
-        {
+        if ($user->expired_at > Carbon::now()) {
             if ($addType === 'day') {
                 $new_expiry = Carbon::parse($user->expired_at)->addDays($addition);
             } else {
                 $new_expiry = Carbon::parse($user->expired_at)->addMinutes($addition);
             }
-        }else{
+        } else {
             if ($addType === 'day') {
                 $new_expiry = Carbon::now()->addDays($addition);
             } else {
@@ -77,39 +76,34 @@ class UserRepository implements UserInterface
     }
 
     /**
-     * validate referral code and return it if be valid
+     * validate referral code and return it if be valid.
      * @param null|string $referral_code
      * @return string|null
      */
     public function checkReferralCode(null|string $referral_code): null|string
     {
-        if (!$referral_code) return null;
-        if(User::query()->where('code_introduce' , $referral_code)->exists())
-        {
-            return $referral_code;
-        }
-        return null;
+        return User::query()->where('code_introduce' , $referral_code)->exists() ? $referral_code : null;
     }
 
     /**
-     * get user as parameter and change token and return token .
+     * get user as parameter and change token and return token.
      * @param User $user
      * @return string
      */
     public function changeUserToken(User $user): string
     {
         $user->tokens()->delete();
-        $token = $user->createToken(env('APP_NAME'));
+        $token = $user->createToken(config('app.name'));
         return $token->plainTextToken;
     }
 
     /**
-     * user registration .
+     * user registration.
      * @param string $prefix_code
      * @param string $phone_number
      * @param null|string $referral_code
      * @return User
-     * @throws Exception
+     * @throws BaseException
      */
     public function registerUser(string $prefix_code, string $phone_number, null|string $referral_code): User
     {
@@ -127,23 +121,19 @@ class UserRepository implements UserInterface
         $user->save();
 
         if ($referral_code) {
-            try {
-                $this->encourageRefer($user);
-            }catch (Exception $e){
-                throw new Exception($e->getMessage());
-            }
+            $this->encourageRefer($user);
         }
 
         return $user;
     }
 
     /**
-     * check is user registered by referral code and add free subscription .
+     * check is user registered by referral code and add free subscription.
      * @param User $user
      * @param string $type
      * @param int $addDays
      * @return void
-     * @throws Exception
+     * @throws BaseException
      */
     public function encourageRefer(User $user, string $type = 'register', int $addDays = 2): void
     {
@@ -156,41 +146,39 @@ class UserRepository implements UserInterface
 
         switch ($type){
             case 'register':
-                $message = 'شما کاربر '.$number.' را به اپلیکیشن لیریکفا معرفی کردید. به ازای آن '. $addDays .' روز اشتراک رایگان دریافت کردید که هم اکنون میتوانید استفاده کنید.';
-                $notification_data = [
-                    'title' => 'معرفی کاربر',
-                    'body' => $message,
-                    'token' => $encouraged_user->fcm_refresh_token,
-                ];
+                $message = sprintf('شما کاربر %u را به اپلیکیشن لیریکفا معرفی کردید. به ازای آن %s روز اشتراک رایگان دریافت کردید که هم اکنون میتوانید استفاده کنید.' , $number , $addDays);
+                $title = 'معرفی کاربر';
                 break;
             case 'subscription':
-                $message = 'شما از معرفی کاربر '.$number.' و خرید اشتراک توسط این کاربر '.$addDays.' روز اشتراک رایگان دریافت کردید که هم اکنون میتوانید استفاده کنید.';
-                $notification_data = [
-                    'title' => 'اشتراک رایگان',
-                    'body' => $message,
-                    'token' => $encouraged_user->fcm_refresh_token,
-                ];
+                $message = sprintf('شما از معرفی کاربر %u و خرید اشتراک توسط این کاربر، %s روز اشتراک رایگان دریافت کردید که هم اکنون میتوانید استفاده کنید.' , $number , $addDays);
+                $title = 'اشتراک رایگان';
                 break;
             default:
                 return;
         }
 
-        (new GoogleNotification())->send($notification_data);
+        SendNotification::dispatch([
+            'title' => $title,
+            'body' => $message,
+            'token' => $encouraged_user->fcm_refresh_token,
+        ]);
 
         $this->addSubscription($encouraged_user, $addDays);
     }
 
     /**
-     * get all user data .
+     * get all user data.
      * @param Request $request
      * @return User
      */
     public function getUserData(Request $request): User
     {
-        $authorized_user = $request->user();
-        $user = User::select(['phone_number' , 'code_introduce' , 'referral_code' , 'fcm_refresh_token' , 'expired_at' , 'created_at' , 'updated_at'])->where('id' , $authorized_user->id)->first();
+        $user = User::select(['phone_number' , 'code_introduce' , 'referral_code' , 'fcm_refresh_token' , 'expired_at' , 'created_at' , 'updated_at'])
+            ->where('id' , $request->user()->id)
+            ->first();
+
         if(!$user){
-            return $authorized_user;
+            return $request->user();
         }
 
         $now = Carbon::now();
@@ -219,7 +207,6 @@ class UserRepository implements UserInterface
     {
         $user->fcm_refresh_token = $token;
         $user->save();
-
         return $user;
     }
 }

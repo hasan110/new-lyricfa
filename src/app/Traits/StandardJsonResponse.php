@@ -38,6 +38,6 @@ trait StandardJsonResponse
             'errors' => $errors,
             'paginate' => $paginate,
             'code' => $code
-        ] , $status_code);
+        ], $status_code);
     }
 }

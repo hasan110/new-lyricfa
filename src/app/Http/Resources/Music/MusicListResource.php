@@ -55,7 +55,7 @@ class MusicListResource extends JsonResource
             'num_like' => $this->likes_count,
             'num_comment' => $this->comments_count,
             'user_like_it' => $this->user_like_it,
-            'average_score' => round($this->scores_avg_score , 2),
+            'average_score' => round($this->scores_avg_score, 2),
         ];
     }
 }

@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->string('key')->primary();
             $table->text('value');
+            $table->text('title')->nullable();
+            $table->boolean('is_public')->default(true);
             $table->longText('description')->nullable();
         });
     }
