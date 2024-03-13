@@ -3,85 +3,88 @@ version: '3.9'
 services:
 
   mysql:
-    container_name: app_mysql
+    container_name: lyricfa_mysql_db
     image: mysql:latest
     ports:
-      - "7000:${DB_PORT}"
+      - "3305:${MYSQL_DB_PORT}"
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - MYSQL_USER=${DB_USERNAME}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_PORT=${DB_PORT}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_DB_ROOT_PASSWORD}
+      - MYSQL_PORT=${MYSQL_DB_PORT}
     networks:
-      app-network:
+      lyricfa-network:
     volumes:
       - ./data/db/mysql:/var/lib/mysql
       - ./data/db/conf.d:/etc/mysql/conf.d
       - ./data/db/logs:/logs:ro
-      # - ./data/db/mysql/mysql_lib:/var/lib/mysql
     restart: always
 
-  service-master:
-    image: main-service
-    container_name: service_master
+  lyricfa-master:
+    image: lyricfa_main_service
+    container_name: lyricfa_service_master
     build:
       args:
         user: ${MAIN_SERVICE_USER}
         uid: ${MAIN_SERVICE_ID}
-      dockerfile: ./data/docker/DockerFile
+        db_host: ${MYSQL_DB_HOST}
+        db_port: ${MYSQL_DB_PORT}
+        queue_connection: ${QUEUE_CONNECTION}
+        redis_host: ${REDIS_HOST}
+        redis_password: ${REDIS_PASSWORD}
+        redis_port: ${REDIS_PORT}
+      dockerfile: DockerFile
     depends_on:
       - mysql
     networks:
-      app-network:
+      lyricfa-network:
     volumes:
-      - app-service:/var/www/app-service/
+      - lyricfa-service:/var/www/lyricfa-service/
     restart: always
 
-  service-worker-1:
-    image: main-service
-    container_name: service_worker_1
+  lyricfa-worker-1:
+    image: lyricfa_main_service
+    container_name: lyricfa_service_worker_1
     depends_on:
       - mysql
     networks:
-      app-network:
+      lyricfa-network:
     volumes:
-      - app-service:/var/www/app-service/
+      - lyricfa-service:/var/www/lyricfa-service/
     restart: always
 
-  service-worker-2:
-    image: main-service
-    container_name: service_worker_2
+  lyricfa-worker-2:
+    image: lyricfa_main_service
+    container_name: lyricfa_service_worker_2
     depends_on:
       - mysql
     networks:
-      app-network:
+      lyricfa-network:
     volumes:
-      - app-service:/var/www/app-service/
+      - lyricfa-service:/var/www/lyricfa-service/
     restart: always
 
   nginx:
     image: nginx:latest
-    container_name: app_nginx
+    container_name: lyricfa_nginx
     ports:
       - "8000:80"
     depends_on:
-      - service-master
+      - lyricfa-master
     networks:
-      app-network:
+      lyricfa-network:
     volumes:
       - ./data/nginx/config:/etc/nginx/conf.d
     restart: always
 
   redis:
     image: redis:latest
-    container_name: app_redis
+    container_name: lyricfa_redis
     networks:
-      app-network:
+      lyricfa-network:
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
 networks:
-  app-network:
+  lyricfa-network:
 
 volumes:
-  app-service:
+  lyricfa-service:
