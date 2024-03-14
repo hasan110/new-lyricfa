@@ -8,6 +8,7 @@ ARG queue_connection
 ARG redis_host
 ARG redis_password
 ARG redis_port
+ARG cache_driver
 
 VOLUME lyricfa-service /var/www/lyricfa-service/
 
@@ -42,7 +43,6 @@ WORKDIR /var/www/lyricfa-service
 
 ENV LYRIC_MAIN_DB_HOST=${db_host}
 ENV LYRIC_MAIN_DB_PORT=${db_port}
-ENV QUEUE_CONNECTION=${queue_connection}
 ENV REDIS_HOST=${redis_host}
 ENV REDIS_PASSWORD=${redis_password}
 ENV REDIS_PORT=${redis_port}
@@ -51,6 +51,8 @@ RUN composer install --prefer-dist --no-interaction && \
     php artisan optimize:clear && \
     php artisan config:cache && \
     php artisan route:cache
+
+ENV CACHE_DRIVER=${cache_driver}
 
 USER $user
 
