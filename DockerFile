@@ -4,6 +4,9 @@ ARG user
 ARG uid
 ARG db_host
 ARG db_port
+ARG db_database
+ARG db_username
+ARG db_password
 ARG queue_connection
 ARG redis_host
 ARG redis_password
@@ -22,6 +25,8 @@ RUN apt-get update && apt-get install -y \
     unzip
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN pecl install redis && docker-php-ext-enable redis
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd soap
 
@@ -43,6 +48,9 @@ WORKDIR /var/www/lyricfa-service
 
 ENV LYRIC_MAIN_DB_HOST=${db_host}
 ENV LYRIC_MAIN_DB_PORT=${db_port}
+ENV LYRIC_MAIN_DB_DATABASE=${db_database}
+ENV LYRIC_MAIN_DB_USERNAME=${db_username}
+ENV LYRIC_MAIN_DB_PASSWORD=${db_password}
 ENV REDIS_HOST=${redis_host}
 ENV REDIS_PASSWORD=${redis_password}
 ENV REDIS_PORT=${redis_port}

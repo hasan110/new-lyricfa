@@ -8,9 +8,11 @@ services:
     ports:
       - "3305:${MYSQL_DB_PORT}"
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_DB_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_DB_PASSWORD}
+      - MYSQL_USER=${MYSQL_DB_USERNAME}
       - MYSQL_PORT=${MYSQL_DB_PORT}
-      - MYSQL_ROOT_HOST='%'
     networks:
       lyricfa-network:
     volumes:
@@ -28,6 +30,9 @@ services:
         uid: ${MAIN_SERVICE_ID}
         db_host: ${MYSQL_DB_HOST}
         db_port: ${MYSQL_DB_PORT}
+        db_database: ${MYSQL_DB_DATABASE}
+        db_username: ${MYSQL_DB_USERNAME}
+        db_password: ${MYSQL_DB_PASSWORD}
         redis_host: ${REDIS_HOST}
         redis_password: ${REDIS_PASSWORD}
         redis_port: ${REDIS_PORT}
