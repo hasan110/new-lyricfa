@@ -9,6 +9,7 @@ use App\Models\SmsVerify;
 use App\Services\SMS\KaveNegar;
 use Carbon\Carbon;
 use App\Exceptions\Throwable\BaseException;
+use Exception;
 
 class AuthRepository implements AuthInterface
 {
@@ -20,70 +21,46 @@ class AuthRepository implements AuthInterface
     }
 
     /**
-     * specifies auth type according to user is register or not.
-     * @param string $prefix_code
-     * @param string $phone_number
-     * @return string
-     */
-    public function checkAuthType(string $prefix_code, string $phone_number): string
-    {
-        $user = $this->userRepository->getUserByMobile($prefix_code, $phone_number);
-
-        return $user ? "login" : "register";
-    }
-
-    /**
-     * send sms include otp code.
-     * @param string $prefix_code
-     * @param string $phone_number
-     * @param int $activate_code
-     * @return void
-     * @throws BaseException
-     */
-    public function sendOTP(string $prefix_code, string $phone_number, int $activate_code): void
-    {
-        $receiver = $prefix_code == '98' ? $phone_number : '00'.$prefix_code.$phone_number;
-        (new KaveNegar())->sendOtpCode($receiver , $activate_code);
-    }
-
-    /**
      * save activation code in database for validation.
-     * @param string $prefix_code
-     * @param string $phone_number
-     * @param string $auth_type
+     * @param string $area_code
+     * @param string $mobile_number
      * @param int $activate_code
      * @return SmsVerify
+     * @throws BaseException
      */
-    public function saveActivationCode(string $prefix_code, string $phone_number, string $auth_type, int $activate_code): SmsVerify
+    public function saveActivationCode(string $area_code, string $mobile_number, int $activate_code): SmsVerify
     {
-        $sms_verify = new SmsVerify;
-        $sms_verify->prefix_code = $prefix_code;
-        $sms_verify->phone_number = $phone_number;
-        $sms_verify->type = $auth_type;
-        if($phone_number == 1234567890 && $auth_type == "login"){
-            $sms_verify->code = 1234; //google play account
-        }else{
-            $sms_verify->code = $activate_code;
+        try {
+            $sms_verify = new SmsVerify;
+            $sms_verify->area_code = $area_code;
+            $sms_verify->mobile_number = $mobile_number;
+            if($mobile_number == 1234567890){
+                $sms_verify->code = 1234; //google play account
+            }else{
+                $sms_verify->code = $activate_code;
+            }
+            $sms_verify->save();
+        } catch (Exception $e) {
+            throw new BaseException($e->getMessage(), 0, true);
         }
-        $sms_verify->save();
 
         return $sms_verify;
     }
 
     /**
      * check activation code is valid or not.
-     * @param string $prefix_code
-     * @param string $phone_number
+     * @param string $area_code
+     * @param string $mobile_number
      * @param int $code
      * @return void
      * @throws BaseException
      */
-    public function checkActivationCode(string $prefix_code, string $phone_number, int $code): void
+    public function checkActivationCode(string $area_code, string $mobile_number, int $code): void
     {
         try {
-            $sms_verify = SmsVerify::orderBy('id', 'DESC')->where('prefix_code', $prefix_code)->where('phone_number', $phone_number)->first();
+            $sms_verify = SmsVerify::orderBy('id', 'DESC')->where('area_code', $area_code)->where('mobile_number', $mobile_number)->first();
             if(!$sms_verify){
-                throw new BaseException(__('errors.invalid_phone_number_in_sms_verify'));
+                throw new BaseException(__('errors.invalid_mobile_number_in_sms_verify'));
             }
 
             $diff_in_minutes = Carbon::parse($sms_verify->updated_at)->diffInMinutes(Carbon::now());
@@ -102,19 +79,19 @@ class AuthRepository implements AuthInterface
 
     /**
      * if user registered changes token and return user data or register user if not register.
-     * @param string $prefix_code
-     * @param string $phone_number
+     * @param string $area_code
+     * @param string $mobile_number
      * @param string|null $referral_code
      * @return string
      * @throws BaseException
      */
-    public function prepareUser(string $prefix_code, string $phone_number, string|null $referral_code): string
+    public function prepareUser(string $area_code, string $mobile_number, string|null $referral_code): string
     {
         try {
-            $user = $this->userRepository->getUserByMobile($prefix_code , $phone_number);
+            $user = $this->userRepository->getUserByMobile($area_code , $mobile_number);
             if(!$user) {
                 $referral_code = $this->userRepository->checkReferralCode($referral_code);
-                $user = $this->userRepository->registerUser($prefix_code, $phone_number, $referral_code);
+                $user = $this->userRepository->registerUser($area_code, $mobile_number, $referral_code);
             }
             $user_token = $this->userRepository->changeUserToken($user);
         }catch (BaseException $e){

@@ -35,13 +35,13 @@ class UserRepository implements UserInterface
 
     /**
      * get user by mobile and prefix code
-     * @param string $prefix_code
-     * @param string $phone_number
+     * @param string $area_code
+     * @param string $mobile_number
      * @return User|null
      */
-    public function getUserByMobile(string $prefix_code, string $phone_number): User|null
+    public function getUserByMobile(string $area_code, string $mobile_number): User|null
     {
-        return User::where('prefix_code' , $prefix_code)->where('phone_number' , $phone_number)->first();
+        return User::where('area_code' , $area_code)->where('mobile_number' , $mobile_number)->first();
     }
 
     /**
@@ -99,13 +99,13 @@ class UserRepository implements UserInterface
 
     /**
      * user registration.
-     * @param string $prefix_code
-     * @param string $phone_number
+     * @param string $area_code
+     * @param string $mobile_number
      * @param null|string $referral_code
      * @return User
      * @throws BaseException
      */
-    public function registerUser(string $prefix_code, string $phone_number, null|string $referral_code): User
+    public function registerUser(string $area_code, string $mobile_number, null|string $referral_code): User
     {
         do{
             $code_introduce = Str::random(6);
@@ -113,8 +113,8 @@ class UserRepository implements UserInterface
         }while($code_introduce_exists);
 
         $user = new User();
-        $user->phone_number = $phone_number;
-        $user->prefix_code = $prefix_code;
+        $user->mobile_number = $mobile_number;
+        $user->area_code = $area_code;
         $user->expired_at = Carbon::now()->addDays(2); // Free subscription
         $user->code_introduce = $code_introduce;
         $user->referral_code = $referral_code;
@@ -142,7 +142,7 @@ class UserRepository implements UserInterface
         $encouraged_user = $this->getUserBy('code_introduce' , $user->referral_code);
         if(!$encouraged_user) return;
 
-        $number = substr($user->phone_number , 0 , 3) . '***' . substr($user->phone_number , -4);
+        $number = substr($user->mobile_number , 0 , 3) . '***' . substr($user->mobile_number , -4);
 
         switch ($type){
             case 'register':
@@ -173,7 +173,7 @@ class UserRepository implements UserInterface
      */
     public function getUserData(Request $request): User
     {
-        $user = User::select(['phone_number' , 'code_introduce' , 'referral_code' , 'fcm_refresh_token' , 'expired_at' , 'created_at' , 'updated_at'])
+        $user = User::select(['mobile_number' , 'code_introduce' , 'referral_code' , 'fcm_refresh_token' , 'expired_at' , 'created_at' , 'updated_at'])
             ->where('id' , $request->user()->id)
             ->first();
 

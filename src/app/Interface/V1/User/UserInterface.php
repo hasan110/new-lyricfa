@@ -36,11 +36,11 @@ interface UserInterface
 
     /**
      * user registration.
-     * @param string $prefix_code
-     * @param string $phone_number
+     * @param string $area_code
+     * @param string $mobile_number
      * @param null|string $referral_code
      */
-    public function registerUser(string $prefix_code, string $phone_number, null|string $referral_code);
+    public function registerUser(string $area_code, string $mobile_number, null|string $referral_code);
 
     /**
      * check is user registered by referral code and add free subscription.

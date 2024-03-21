@@ -3,7 +3,7 @@
 return [
     'data_not_found' => 'No information found.',
     'validation_error' => 'An error occurred in data validation.',
-    'invalid_phone_number_in_sms_verify' => 'The phone number entered is invalid.',
+    'invalid_mobile_number_in_sms_verify' => 'The phone number entered is invalid.',
     'activation_code_expired' => 'The activation code has expired or is incorrect.',
     'activation_code_is_wrong' => 'The activation code is incorrect.',
     'error_send_otp_code' => 'An error occurred while sending the SMS.',

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('LYRIC_MAIN_DB_CONNECTION', 'lyric'),
+    'default' => env('LYRICFA_MAIN_DB_CONNECTION', 'lyricfa'),
 
     /*
     |--------------------------------------------------------------------------
@@ -35,15 +35,15 @@ return [
 
     'connections' => [
 
-        'lyric' => [
+        'lyricfa' => [
             'driver' => 'mysql',
-            'url' => env('LYRIC_MAIN_DATABASE_URL'),
-            'host' => env('LYRIC_MAIN_DB_HOST', '127.0.0.1'),
-            'port' => env('LYRIC_MAIN_DB_PORT', '3306'),
-            'database' => env('LYRIC_MAIN_DB_DATABASE', 'forge'),
-            'username' => env('LYRIC_MAIN_DB_USERNAME', 'forge'),
-            'password' => env('LYRIC_MAIN_DB_PASSWORD', ''),
-            'unix_socket' => env('LYRIC_MAIN_DB_SOCKET', ''),
+            'url' => env('LYRICFA_MAIN_DATABASE_URL'),
+            'host' => env('LYRICFA_MAIN_DB_HOST', '127.0.0.1'),
+            'port' => env('LYRICFA_MAIN_DB_PORT', '3306'),
+            'database' => env('LYRICFA_MAIN_DB_DATABASE', 'forge'),
+            'username' => env('LYRICFA_MAIN_DB_USERNAME', 'forge'),
+            'password' => env('LYRICFA_MAIN_DB_PASSWORD', ''),
+            'unix_socket' => env('LYRICFA_MAIN_DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',

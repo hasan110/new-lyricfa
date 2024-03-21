@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 /**
  * @property int $id
  * @property string $comment
- * @property int|string $user_phone_number
+ * @property int|string $user_mobile_number
  * @property User $user
  */
 class CommentListResource extends JsonResource
@@ -22,12 +22,12 @@ class CommentListResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $user_phone_number = substr($this->user->phone_number, 0, 3) . '***' . substr($this->user->phone_number, -4);
+        $user_mobile_number = substr($this->user->mobile_number, 0, 3) . '***' . substr($this->user->mobile_number, -4);
 
         return [
             'id' => $this->id,
             'comment' => $this->comment,
-            'user_phone_number' => $user_phone_number
+            'user_mobile_number' => $user_mobile_number
         ];
     }
 }

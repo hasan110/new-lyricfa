@@ -16,7 +16,7 @@ class KaveNegar implements ServiceInterface
 
     public function __construct()
     {
-        $this->base_url = config('lyric.kavenegar.base_url');
+        $this->base_url = config('lyricfa.kavenegar.base_url');
     }
 
     /**
@@ -29,7 +29,7 @@ class KaveNegar implements ServiceInterface
     public function sendOtpCode(string $receiver, int $activate_code): bool
     {
         try {
-            $url = config('lyric.kavenegar.api_key') . config('lyric.kavenegar.lookup_url');
+            $url = config('lyricfa.kavenegar.api_key') . config('lyricfa.kavenegar.lookup_url');
             $this->call('POST', $url, [
                 'receptor' => $receiver,
                 'token' => $activate_code,
@@ -47,23 +47,17 @@ class KaveNegar implements ServiceInterface
     public function call(string $method, string $url , array $data = [] , array $headers = []) : Response|PromiseInterface
     {
         $url = $this->base_url . $url;
-        $request = Http::withHeaders($headers);
         $method = strtoupper($method);
 
-        switch ($method) {
-            case 'post':
-                $response = $request->asForm()->post($url , $data);
-            break;
-            case 'get':
-            default:
-                $response = $request->get($url , $data);
-            break;
+        $request = Http::withHeaders($headers);
+
+        if ($method === 'POST') {
+            $request = $request->asForm();
         }
 
+        $response = $request->send($method, $url, $data);
+
         if (!$response->successful()) {
-            // $status = $response->status();
-            // $data = $response->json();
-            // $message = (isset($data['return']) && isset($data['return']['message'])) ? $data['return']['message'] : '';
             throw new BaseException(__('errors.error_in_send_sms'));
         }
 

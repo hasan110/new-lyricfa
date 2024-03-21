@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
  * App\Models\SmsVerify
  *
  * @property int $id
- * @property string $prefix_code
- * @property string $phone_number
+ * @property string $area_code
+ * @property string $mobile_number
  * @property string $type
  * @property string $code
  * @property Carbon|null $created_at

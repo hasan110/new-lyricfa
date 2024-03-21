@@ -25,15 +25,15 @@ if (!function_exists('validateData')) {
     }
 }
 
-if (!function_exists('validateMobile')) {
+if (!function_exists('validate_mobile')) {
     /**
      * validate and remove additional characters from mobile number
-     * @param string $prefix_code
-     * @param string $phone_number
+     * @param string $area_code
+     * @param string $mobile_number
      * @return array
      */
-    function validateMobile(string $prefix_code, string $phone_number): array
+    function validate_mobile(string $area_code, string $mobile_number): array
     {
-        return [$prefix_code, $phone_number];
+        return [homogenization($area_code), homogenization($mobile_number)];
     }
 }

@@ -16,7 +16,7 @@ class GoogleNotification implements ServiceInterface
 
     public function __construct()
     {
-        $this->base_url = config('lyric.google_notification.base_url');
+        $this->base_url = config('lyricfa.google_notification.base_url');
     }
 
     /**
@@ -33,7 +33,7 @@ class GoogleNotification implements ServiceInterface
 
         try {
             $headers = [
-                'Authorization:key=' . config('lyric.google_notification.api_key'),
+                'Authorization:key=' . config('lyricfa.google_notification.api_key'),
                 'Content-Type: application/json'
             ];
 
@@ -53,7 +53,7 @@ class GoogleNotification implements ServiceInterface
                 'to' => $data['token']
             ];
 
-            $this->call('POST', config('lyric.google_notification.send_notification_url'), $data, $headers);
+            $this->call('POST', config('lyricfa.google_notification.send_notification_url'), $data, $headers);
 
             return true;
 

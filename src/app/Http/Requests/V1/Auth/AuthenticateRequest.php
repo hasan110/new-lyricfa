@@ -23,8 +23,8 @@ class AuthenticateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_number' => 'required|numeric',
-            'prefix_code' => 'required'
+            'mobile_number' => 'required|numeric',
+            'area_code' => 'required'
         ];
     }
 }

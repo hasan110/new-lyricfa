@@ -3,7 +3,7 @@
 return [
     'data_not_found' => 'اطلاعات یافت نشد.',
     'validation_error' => 'خطا در اعتبارسنجی اطلاعات رخ داده است.',
-    'invalid_phone_number_in_sms_verify' => 'شماره تلفن وارد شده نامعتبر است.',
+    'invalid_mobile_number_in_sms_verify' => 'شماره تلفن وارد شده نامعتبر است.',
     'activation_code_expired' => 'کد فعال سازی منقضی شده و یا اشتباه است.',
     'activation_code_is_wrong' => 'کد فعال سازی اشتباه است.',
     'error_send_otp_code' => 'خطایی هنگام ارسال پیامک رخ داده است.',

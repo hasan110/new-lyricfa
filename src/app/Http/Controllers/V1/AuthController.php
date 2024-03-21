@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\Throwable\SendSmsException;
 use App\Exceptions\Throwable\BaseException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Auth\AuthenticateRequest;
 use App\Http\Requests\V1\Auth\OtpRequest;
 use App\Interface\V1\Auth\AuthInterface;
 use App\Repository\V1\Auth\AuthRepository;
+use App\Services\SMS\KaveNegar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -27,16 +29,15 @@ class AuthController extends Controller
      */
     public function authenticate(AuthenticateRequest $request): JsonResponse
     {
-        list($prefix_code, $phone_number) = validateMobile($request->input('prefix_code'), $request->input('phone_number'));
+        list($area_code, $mobile_number) = validate_mobile($request->input('area_code'), $request->input('mobile_number'));
 
         try {
             DB::beginTransaction();
             $activate_code = rand(1000, 9999);
-            $auth_type = $this->authRepository->checkAuthType($prefix_code, $phone_number);
-            $this->authRepository->sendOTP($prefix_code, $phone_number, $activate_code);
-            $this->authRepository->saveActivationCode($prefix_code, $phone_number, $auth_type, $activate_code);
+            (new KaveNegar())->sendOtpCode($mobile_number , $activate_code);
+            $this->authRepository->saveActivationCode($area_code, $mobile_number, $activate_code);
             DB::commit();
-        }catch (BaseException $e){
+        } catch (SendSmsException|BaseException $e){
             DB::rollBack();
             return $this->error($e->getMessage(), []);
         }
@@ -51,12 +52,12 @@ class AuthController extends Controller
      */
     public function otp(OtpRequest $request): JsonResponse
     {
-        list($prefix_code, $phone_number) = validateMobile($request->input('prefix_code'), $request->input('phone_number'));
+        list($area_code, $mobile_number) = validate_mobile($request->input('area_code'), $request->input('mobile_number'));
 
         try {
             DB::beginTransaction();
-            $this->authRepository->checkActivationCode($prefix_code, $phone_number, $request->input('code'));
-            $token = $this->authRepository->prepareUser($prefix_code, $phone_number, $request->input('referral_code'));
+            $this->authRepository->checkActivationCode($area_code, $mobile_number, $request->input('code'));
+            $token = $this->authRepository->prepareUser($area_code, $mobile_number, $request->input('referral_code'));
             DB::commit();
         }catch (BaseException $e){
             DB::rollBack();
