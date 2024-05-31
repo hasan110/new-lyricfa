@@ -10,6 +10,7 @@ return [
     'google_notification_error' => 'An error occurred while sending the notification.',
     'http_method_not_allowed' => 'The request method is not supported.',
     'http_unauthorized' => 'An authentication error occurred.',
+    'http_too_many_request' => 'Too many attempts, please stop !!!.',
     'http_page_not_found' => 'The desired path was not found.',
     'an_error_occurred' => 'An error has occurred.',
     'error_in_send_sms' => 'An error occurred while sending the SMS.',

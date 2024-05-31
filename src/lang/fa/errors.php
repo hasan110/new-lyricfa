@@ -10,6 +10,7 @@ return [
     'google_notification_error' => 'خطایی هنگام ارسال نوتیفیکیشن رخ داده است.',
     'http_method_not_allowed' => 'نوع درخواست پشتیبانی نمی شود.',
     'http_unauthorized' => 'خطا در احراز هویت رخ داده است.',
+    'http_too_many_request' => 'درخواست بیش از حد مجاز؛ دست نگهدارید !!!.',
     'http_page_not_found' => 'مسیر مورد نظر یافت نشد.',
     'an_error_occurred' => 'خطایی رخ داده است.',
     'error_in_send_sms' => 'خطایی هنگام ارسال پیامک رخ داده است.',
