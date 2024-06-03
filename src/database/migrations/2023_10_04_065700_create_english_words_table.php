@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('english_words', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('ci_word');
-            $table->text('english_definition')->nullable();
+            $table->string('word');
             $table->string('word_forms')->nullable();
             $table->timestamps();
         });

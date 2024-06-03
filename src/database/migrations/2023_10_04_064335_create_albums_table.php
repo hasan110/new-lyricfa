@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('english_name')->nullable();
             $table->string('persian_name')->nullable();
+            $table->date('published_at')->nullable();
             $table->timestamps();
         });
     }

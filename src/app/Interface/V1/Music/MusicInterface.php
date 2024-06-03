@@ -33,5 +33,5 @@ interface MusicInterface
      * @param array $filters
      * @return mixed
      */
-    public function filter(array $filters): mixed;
+    public function searchMusics(array $filters): mixed;
 }

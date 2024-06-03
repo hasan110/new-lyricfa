@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * App\Models\EnglishWord
  *
  * @property int $id
- * @property string $ci_word
+ * @property string $word
  * @property string $word_forms
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

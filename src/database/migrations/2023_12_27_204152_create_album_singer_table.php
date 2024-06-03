@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('albume_singer', function (Blueprint $table) {
+        Schema::create('album_singer', function (Blueprint $table) {
             $table->bigInteger('album_id')->unsigned();
             $table->foreign('album_id')->references('id')->on('albums')->onDelete('cascade');
             $table->bigInteger('singer_id')->unsigned();
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('albume_singer');
+        Schema::dropIfExists('album_singer');
     }
 };

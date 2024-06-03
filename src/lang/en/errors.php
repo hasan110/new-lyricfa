@@ -18,4 +18,7 @@ return [
     'comment_not_found' => 'Comment not found.',
     'comment_edit_access_denied' => 'You do not have access to edit this comment.',
     'word_not_found' => 'Word not found.',
+    'playlist_name_exists' => 'There is a playlist with this name.',
+    'playlist_not_found' => 'Playlist not found.',
+    'music_not_found' => 'Music not found.',
 ];

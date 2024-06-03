@@ -23,7 +23,7 @@ class MusicRepository implements MusicInterface
      */
     public function getList(array $filters): array
     {
-        $query = $this->filter($filters);
+        $query = $this->searchMusics($filters);
         $paginate = null;
 
         if (isset($filters['limit']) && $filters['limit']) {
@@ -53,7 +53,7 @@ class MusicRepository implements MusicInterface
      */
     public function getInfo(mixed $music_id): MusicListResource|null
     {
-        $music = $this->filter([
+        $music = $this->searchMusics([
             'music_id' => $music_id
         ])->first();
 
@@ -70,9 +70,7 @@ class MusicRepository implements MusicInterface
      */
     public function addView(mixed $music_id): void
     {
-        $music = $this->filter([
-            'music_id' => $music_id
-        ])->first();
+        $music = $this->getMusicById($music_id);
 
         if (!$music) {
             throw new BaseException(__('errors.data_not_found'));
@@ -86,7 +84,7 @@ class MusicRepository implements MusicInterface
      * @param array $filters
      * @return mixed
      */
-    public function filter(array $filters): mixed
+    public function searchMusics(array $filters): mixed
     {
         $query = Music::query()->select('*');
 
@@ -131,7 +129,16 @@ class MusicRepository implements MusicInterface
             $query = $query->inRandomOrder();
         }
         if (isset($filters['music_id']) && $filters['music_id']) {
-            $query = $query->where('id' , $filters['music_id']);
+            if (is_array($filters['music_id'])) {
+                $query = $query->whereIn('id' , $filters['music_id']);
+            } else {
+                $query = $query->where('id' , $filters['music_id']);
+            }
+        }
+        if (isset($filters['playlist_id']) && $filters['playlist_id']) {
+            $query = $query->whereHas('playlists', function ($query) use ($filters) {
+                $query->where('playlist_id', $filters['playlist_id']);
+            });
         }
 
         $query = $query->withExists(['likes as user_like_it' => function ($builder) {

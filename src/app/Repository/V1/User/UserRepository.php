@@ -7,6 +7,7 @@ use App\Interface\V1\User\UserInterface;
 use App\Jobs\SendNotification;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -34,7 +35,7 @@ class UserRepository implements UserInterface
     }
 
     /**
-     * get user by mobile and prefix code
+     * get user by mobile and area code
      * @param string $area_code
      * @param string $mobile_number
      * @return User|null
@@ -107,24 +108,24 @@ class UserRepository implements UserInterface
      */
     public function registerUser(string $area_code, string $mobile_number, null|string $referral_code): User
     {
-        do{
-            $code_introduce = Str::random(6);
-            $code_introduce_exists = User::query()->where('code_introduce' , $code_introduce)->exists();
-        }while($code_introduce_exists);
+        try {
+            do {
+                $code_introduce = Str::random(6);
+                $code_introduce_exists = User::query()->where('code_introduce' , $code_introduce)->exists();
+            } while($code_introduce_exists);
 
-        $user = new User();
-        $user->mobile_number = $mobile_number;
-        $user->area_code = $area_code;
-        $user->expired_at = Carbon::now()->addDays(2); // Free subscription
-        $user->code_introduce = $code_introduce;
-        $user->referral_code = $referral_code;
-        $user->save();
+            $user = new User();
+            $user->mobile_number = $mobile_number;
+            $user->area_code = $area_code;
+            $user->expired_at = Carbon::now()->addDays(2);
+            $user->code_introduce = $code_introduce;
+            $user->referral_code = $referral_code;
+            $user->save();
 
-        if ($referral_code) {
-            $this->encourageRefer($user);
+            return $user;
+        } catch (Exception $e) {
+            throw new BaseException($e->getMessage(), 0, true);
         }
-
-        return $user;
     }
 
     /**

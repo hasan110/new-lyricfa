@@ -9,7 +9,7 @@ use App\Http\Requests\V1\Auth\AuthenticateRequest;
 use App\Http\Requests\V1\Auth\OtpRequest;
 use App\Interface\V1\Auth\AuthInterface;
 use App\Repository\V1\Auth\AuthRepository;
-use App\Services\SMS\KaveNegar;
+use App\Services\SMS\KaveNegarService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -34,7 +34,7 @@ class AuthController extends Controller
         try {
             DB::beginTransaction();
             $activate_code = rand(1000, 9999);
-            (new KaveNegar())->sendOtpCode($mobile_number , $activate_code);
+            (new KaveNegarService())->sendOtpCode($mobile_number , $activate_code);
             $this->authRepository->saveActivationCode($area_code, $mobile_number, $activate_code);
             DB::commit();
         } catch (SendSmsException|BaseException $e){

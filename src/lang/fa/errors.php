@@ -18,4 +18,7 @@ return [
     'comment_not_found' => 'دیدگاه مورد نظر یافت نشد.',
     'comment_edit_access_denied' => 'شما دسترسی ویرایش این دیدگاه را ندارید.',
     'word_not_found' => 'لغت یافت نشد.',
+    'playlist_name_exists' => 'لیست پخشی با این اسم وجود دارد.',
+    'playlist_not_found' => 'لیست پخش یافت نشد.',
+    'music_not_found' => 'آهنگ مورد نظر یافت نشد.',
 ];

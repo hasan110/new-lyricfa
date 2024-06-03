@@ -217,6 +217,7 @@ return [
         "area_code" => "پیش شماره",
         "commentable_id" => "شناسه مورد دیدگاه",
         "comment" => "دیدگاه",
+        "playlist_id" => "شناسه لیست پخش",
     ],
 
 ];

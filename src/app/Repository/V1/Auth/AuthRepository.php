@@ -6,7 +6,6 @@ use App\Interface\V1\Auth\AuthInterface;
 use App\Interface\V1\User\UserInterface;
 use App\Repository\V1\User\UserRepository;
 use App\Models\SmsVerify;
-use App\Services\SMS\KaveNegar;
 use Carbon\Carbon;
 use App\Exceptions\Throwable\BaseException;
 use Exception;
@@ -72,7 +71,7 @@ class AuthRepository implements AuthInterface
                 throw new BaseException(__('errors.activation_code_is_wrong'));
             }
             $sms_verify->delete();
-        }catch (BaseException $e){
+        } catch (BaseException $e) {
             throw new BaseException($e->getMessage());
         }
     }
@@ -89,12 +88,16 @@ class AuthRepository implements AuthInterface
     {
         try {
             $user = $this->userRepository->getUserByMobile($area_code , $mobile_number);
-            if(!$user) {
+            if (!$user) {
                 $referral_code = $this->userRepository->checkReferralCode($referral_code);
                 $user = $this->userRepository->registerUser($area_code, $mobile_number, $referral_code);
+
+                if ($referral_code) {
+                    $this->userRepository->encourageRefer($user);
+                }
             }
             $user_token = $this->userRepository->changeUserToken($user);
-        }catch (BaseException $e){
+        } catch (BaseException $e) {
             throw new BaseException($e->getMessage());
         }
 

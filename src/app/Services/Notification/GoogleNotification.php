@@ -26,8 +26,7 @@ class GoogleNotification implements ServiceInterface
      */
     public function send(array $data): bool
     {
-        if(!isset($data['token']))
-        {
+        if(!isset($data['token']) || !$data['token']) {
             return false;
         }
 
@@ -57,8 +56,7 @@ class GoogleNotification implements ServiceInterface
 
             return true;
 
-        }catch (BaseException|Exception $e){
-            // throw new GoogleNotificationException($e->getMessage());
+        } catch (BaseException|Exception $e) {
             return false;
         }
     }
@@ -75,24 +73,25 @@ class GoogleNotification implements ServiceInterface
     public function call(string $method, string $url, array $data = [], array $headers = []) : Response|PromiseInterface
     {
         $url = $this->base_url . $url;
-        $request = Http::withHeaders($headers);
         $method = strtoupper($method);
 
+        $request = Http::withHeaders($headers);
+
+        if ($method === 'POST') {
+            $request = $request->asForm();
+        }
+
         switch ($method) {
-            case 'post':
-                $response = $request->asForm()->post($url, $data);
+            case 'POST':
+                $response = $request->post($url, $data);
             break;
-            case 'get':
+            case 'GET':
             default:
                 $response = $request->get($url, $data);
             break;
         }
 
-        if (!$response->successful())
-        {
-            // $status = $response->status();
-            // $data = $response->json();
-            // $message = isset($data['message']) ?? __('errors.google_notification_error').' ('.$status.')';
+        if (!$response->successful()) {
             throw new BaseException(__('errors.google_notification_error'));
         }
 

@@ -20,7 +20,8 @@ return new class extends Migration
             $table->integer('priority')->nullable();
             $table->text('text_english')->nullable();
             $table->text('text_persian')->nullable();
-            $table->string('start_end_time')->nullable();
+            $table->integer('start_time');
+            $table->integer('end_time');
             $table->text('comments')->nullable();
             $table->timestamps();
         });

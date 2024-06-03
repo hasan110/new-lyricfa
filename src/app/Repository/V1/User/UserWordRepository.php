@@ -191,14 +191,14 @@ class UserWordRepository implements UserWordInterface
             $word = $this->wordRepository->getWordBy('english_word', $review->word);
 
             if ($word) {
-                $english_word = $this->wordRepository->getEnglishWordBy('ci_word', $review->word);
+                $english_word = $this->wordRepository->getEnglishWordBy('word', $review->word);
                 $idioms = $this->idiomRepository->getWordIdioms($review->word);
             } else {
                 $map = $this->wordRepository->findMap($review->word);
 
                 if ($map) {
                     $word = $this->wordRepository->getWordBy('english_word', $map->ci_base);
-                    $english_word = $this->wordRepository->getEnglishWordBy('ci_word', $map->ci_base);
+                    $english_word = $this->wordRepository->getEnglishWordBy('word', $map->ci_base);
                     $idioms = $this->idiomRepository->getWordIdioms($map->ci_base);
                 } else {
                     $word = null;

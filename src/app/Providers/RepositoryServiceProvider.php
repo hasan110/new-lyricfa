@@ -11,6 +11,7 @@ use App\Interface\V1\Comment\CommentInterface;
 use App\Interface\V1\User\UserWordInterface;
 use App\Interface\V1\Dictionary\WordInterface;
 use App\Interface\V1\Dictionary\IdiomInterface;
+use App\Interface\V1\Music\PlaylistInterface;
 
 use App\Repository\V1\Auth\AuthRepository;
 use App\Repository\V1\User\UserRepository;
@@ -21,6 +22,7 @@ use App\Repository\V1\Comment\CommentRepository;
 use App\Repository\V1\User\UserWordRepository;
 use App\Repository\V1\Dictionary\WordRepository;
 use App\Repository\V1\Dictionary\IdiomRepository;
+use App\Repository\V1\Music\PlaylistRepository;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -44,6 +46,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(WordInterface::class, WordRepository::class);
         $this->app->bind(WordInterface::class, WordRepository::class);
         $this->app->bind(IdiomInterface::class, IdiomRepository::class);
+        $this->app->bind(PlaylistInterface::class, PlaylistRepository::class);
     }
 
     /**
