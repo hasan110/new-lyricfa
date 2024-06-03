@@ -3,7 +3,7 @@
 namespace App\Exceptions;
 
 use App\Exceptions\Throwable\BaseException;
-use App\Exceptions\Throwable\ValidationException as CustumValidationException;
+use App\Exceptions\Throwable\ValidationException as CustomValidationException;
 use Illuminate\Validation\ValidationException;
 use App\Traits\StandardJsonResponse;
 use Exception;
@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseCode;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -77,9 +78,11 @@ class Handler extends ExceptionHandler
     public function jsonResponse(Throwable $e): JsonResponse
     {
         switch ($e) {
+            case $e instanceof TooManyRequestsHttpException:
+                return $this->error(__('errors.http_too_many_request') , null , ResponseCode::HTTP_TOO_MANY_REQUESTS);
             case $e instanceof AuthenticationException:
                 return $this->error(__('errors.http_unauthorized') , null , ResponseCode::HTTP_UNAUTHORIZED);
-            case $e instanceof CustumValidationException:
+            case $e instanceof CustomValidationException:
                 return $this->error(__('errors.validation_error') , $e->errors , ResponseCode::HTTP_UNPROCESSABLE_ENTITY);
             case $e instanceof ValidationException:
                 return $this->error(__('errors.validation_error') , $e->errors() , ResponseCode::HTTP_UNPROCESSABLE_ENTITY);
