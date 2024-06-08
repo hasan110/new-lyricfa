@@ -5,8 +5,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $code }} - {{ $message }}</title>
-        <link type="text/css" rel="stylesheet" href="{{asset('assets/css/fontawesome/font-awesome.min.css')}}" />
-        <link type="text/css" rel="stylesheet" href="{{asset('assets/css/error-pages.css')}}" />
+        <link type="text/css" rel="stylesheet" href="{{asset('assets/css/fontawesome/font-awesome.min.css' , true)}}" />
+        <link type="text/css" rel="stylesheet" href="{{asset('assets/css/error-pages.css' , true)}}" />
     </head>
     <body>
         <div id="notfound">
