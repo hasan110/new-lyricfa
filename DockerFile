@@ -56,7 +56,9 @@ ENV REDIS_PASSWORD=${redis_password}
 ENV REDIS_PORT=${redis_port}
 
 RUN composer install --prefer-dist --no-interaction && \
-    php artisan optimize:clear
+    php artisan optimize:clear && \
+    php artisan cache:clear && \
+    php artisan config:cache
 
 ENV CACHE_DRIVER=${cache_driver}
 
