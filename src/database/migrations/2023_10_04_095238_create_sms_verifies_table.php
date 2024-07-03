@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('sms_verifies', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('mobile_number');
-            $table->string('area_code')->default('98');
+            $table->string('phone_number');
+            $table->string('prefix_code')->default('98');
             $table->string('type')->default('login');
             $table->string('code');
             $table->timestamps();
