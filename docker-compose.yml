@@ -5,6 +5,8 @@ services:
   lyricfa:
     image: lyricfa_service
     container_name: lyricfa
+    ports:
+      - "8000:8000"
     build:
       args:
         user: ${MAIN_SERVICE_USER}
