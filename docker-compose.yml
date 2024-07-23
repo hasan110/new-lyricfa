@@ -2,82 +2,17 @@ version: '3.9'
 
 services:
 
-  mysql:
-    container_name: lyricfa_mysql_db
-    image: mysql:latest
-    ports:
-      - "${MYSQL_DB_PORT}:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_DB_ROOT_PASSWORD}
-      - MYSQL_PORT=${MYSQL_DB_PORT}
-      - MYSQL_DATABASE=${MYSQL_DB_DATABASE}
-      - MYSQL_PASSWORD=${MYSQL_DB_PASSWORD}
-      - MYSQL_USER=${MYSQL_DB_USERNAME}
-    networks:
-      lyricfa-network:
-    volumes:
-      - ./data/db/mysql/mysql:/var/lib/mysql
-      - ./data/db/mysql/conf.d:/etc/mysql/conf.d
-      - ./data/db/mysql/logs:/logs:ro
-    restart: always
-
-  lyricfa-master:
-    image: lyricfa_main_service
-    container_name: lyricfa_service_master
+  lyricfa:
+    image: lyricfa_service
+    container_name: lyricfa
     build:
       args:
         user: ${MAIN_SERVICE_USER}
         uid: ${MAIN_SERVICE_ID}
-        db_host: ${MYSQL_DB_HOST}
-        db_port: ${MYSQL_DB_PORT}
-        db_database: ${MYSQL_DB_DATABASE}
-        db_username: ${MYSQL_DB_USERNAME}
-        db_password: ${MYSQL_DB_PASSWORD}
-        redis_host: ${REDIS_HOST}
-        redis_password: ${REDIS_PASSWORD}
-        redis_port: ${REDIS_PORT}
-        cache_driver: ${CACHE_DRIVER}
       dockerfile: DockerFile
-    depends_on:
-      - mysql
-    networks:
-      lyricfa-network:
     volumes:
       - lyricfa-service:/var/www/lyricfa-service/
     restart: always
-
-  lyricfa-worker-1:
-    image: lyricfa_main_service
-    container_name: lyricfa_service_worker_1
-    depends_on:
-      - mysql
-    networks:
-      lyricfa-network:
-    volumes:
-      - lyricfa-service:/var/www/lyricfa-service/
-    restart: always
-
-  lyricfa-worker-2:
-    image: lyricfa_main_service
-    container_name: lyricfa_service_worker_2
-    depends_on:
-      - mysql
-    networks:
-      lyricfa-network:
-    volumes:
-      - lyricfa-service:/var/www/lyricfa-service/
-    restart: always
-
-  redis:
-    image: redis:latest
-    container_name: lyricfa_redis
-    networks:
-      lyricfa-network:
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-
-networks:
-  lyricfa-network:
 
 volumes:
   lyricfa-service:
